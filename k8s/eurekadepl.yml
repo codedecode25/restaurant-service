@@ -1,0 +1,96 @@
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: eureka-cm
+#data:
+#  # if you want to deploy n instances of eureka cluster,
+#  # you should set eureka_service_address: http://eureka-0.eureka:8761/eureka,...,http://eureka-(n-1).eureka:8761/eureka
+#  eureka_service_address: http://eureka-0.eureka:8761/eureka,http://eureka-1.eureka:8761/eureka,http://eureka-2.eureka:8761/eureka
+
+
+
+
+#apiVersion: apps/v1
+#kind: StatefulSet
+#metadata:
+#  name: eureka
+#spec:
+#  serviceName: 'eureka'
+#  # n instances
+#  replicas: 3
+#  selector:
+#    matchLabels:
+#      app: eureka-app
+#  template:
+#    metadata:
+#      labels:
+#        app: eureka-app
+#    spec:
+#      containers:
+#        - name: eureka-app
+#          image: bitinit/eureka
+#          ports:
+#            - containerPort: 8761
+#          resources:
+#            requests:
+#              memory: "1Gi"
+#              cpu: "500m"
+#            limits:
+#              memory: "1200Mi"
+#              cpu: "500m"
+#          env:
+#            - name: EUREKA_SERVER_ADDRESS
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: eureka-cm
+#                  key: eureka_service_address
+#            - name: ENVIRONMENT
+#              value: "prod"
+#            - name: JVM_OPTS
+#              value: "-Xms1g -Xmx1g"
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: 8761
+#            initialDelaySeconds: 30
+#            periodSeconds: 10
+#            timeoutSeconds: 5
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: 8761
+#            initialDelaySeconds: 30
+#            periodSeconds: 10
+#            timeoutSeconds: 5
+
+---
+
+#apiVersion: apps/v1
+#kind: Deployment # Kubernetes resource kind we are creating
+#metadata:
+#  name: eureka-app
+#  labels:
+#    app: eureka-app
+#spec:
+#  replicas: 2 # Number of replicas that will be created for this deployment
+#  selector:
+#    matchLabels:
+#      app: eureka-app
+#  template:
+#    metadata:
+#      labels:
+#        app: eureka-app
+#    spec:
+#      containers:
+#        - name: eureka-app
+#          image: codedecode25/eureka:1.0.0 # Image that will be used to containers in the cluster
+#          imagePullPolicy: IfNotPresent
+#          ports:
+#            - containerPort: 8761 #
+#          resources:
+#            limits:
+#              cpu: 0.2
+#              memory: "200Mi"
+
+---
+
