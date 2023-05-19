@@ -1,11 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: test3
-  annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
+   name: test3
 spec:
+  ingressClassName: nginx
   rules:
     - http:
         paths:
@@ -16,7 +14,13 @@ spec:
                 name: angular-service
                 port:
                   number: 80
-
+          - path: /order
+            pathType: Prefix
+            backend:
+              service:
+                name: order-service
+                port:
+                  number: 9094
           - path: /restaurant
             pathType: Prefix
             backend:
@@ -24,7 +28,6 @@ spec:
                 name: restaurant-service
                 port:
                   number: 9090
-
           - path: /fooditems
             pathType: Prefix
             backend:
@@ -33,18 +36,7 @@ spec:
                 port:
                   number: 9092
 
-          - path: /order
-            pathType: Prefix
-            backend:
-              service:
-                name: order-service
-                port:
-                  number: 9094
 
-          - path: /eureka
-            pathType: Prefix
-            backend:
-              service:
-                name: eureka-lb
-                port:
-                  number: 8761
+
+    # This section is only required if TLS is to be enabled for the Ingress
+  
