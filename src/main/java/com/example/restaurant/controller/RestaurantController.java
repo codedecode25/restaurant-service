@@ -1,6 +1,8 @@
 package com.example.restaurant.controller;
 
+import com.example.restaurant.dto.RestaurantDTO;
 import com.example.restaurant.entity.Restaurant;
+import com.example.restaurant.mapper.RestaurantMapper;
 import com.example.restaurant.repositories.RestaurantRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,8 +33,12 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = "/id/{id}")
-    public ResponseEntity<Restaurant> findRestaurantById(@PathVariable Integer id) {
+    public ResponseEntity<RestaurantDTO> findRestaurantById(@PathVariable Integer id) {
         Optional<Restaurant> restaurant = restaurantRepo.findById(id);
-        return new ResponseEntity<>(restaurant.get(), HttpStatus.OK);
+        if(restaurant.isPresent()){
+            RestaurantDTO restaurantDto =  RestaurantMapper.RESTAURANT_MAPPER.restaurantToRestaurantDTO(restaurant.get());
+            return new ResponseEntity<>(restaurantDto, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 }
